@@ -14,7 +14,6 @@ from maythusharmusic.utils.database import (
     add_served_user,
     blacklisted_chats,
     get_lang,
-    is_banned_user,
     is_on_off,
 )
 from maythusharmusic.utils.decorators.language import LanguageStart
@@ -84,68 +83,19 @@ async def start_pm(client, message: Message, _):
                     text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                 )
     else:
-
+        out = private_panel(_)
         try:
-            out = private_panel(_)
-            lol = await message.reply_text("**ω ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωє ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓ ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄ ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍ ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍᴇ ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍᴇ в ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍᴇ вα ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍᴇ вαв ᥫ᭡**")
-            await asyncio.sleep(0.5)
-            await lol.edit_text("**ωєℓᴄᴏᴍᴇ вαву ᥫ᭡**")
-               
-            await lol.delete()
-            lols = await message.reply_text("**⚡️ѕ**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("⚡ѕт")        
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтα**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαя**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαят**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαятι**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαятιи**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαятιиg**")
-            await asyncio.sleep(0.1)
-            await lols.edit_text("**⚡ѕтαятιиg.**")
-
-            await lols.edit_text("**⚡ѕтαятιиg....**")
-
-            await lols.edit_text("**⚡ѕтαятιиg.**")
-            await lols.edit_text("**⚡ѕтαятιиg....**")
-            m = await message.reply_sticker("CAACAgUAAxkBAAEP1iZpIbqC1oXAVuwP0n3b9oNnnHRlvQAC0g4AAqVyqVcL00FzQjR1ZjYE")
             if message.chat.photo:
-
                 userss_photo = await app.download_media(
                     message.chat.photo.big_file_id,
                 )
             else:
                 userss_photo = "assets/nodp.png"
-            if userss_photo:
-                chat_photo = userss_photo
-            chat_photo = userss_photo if userss_photo else START_IMG_URL
-
+                
+            chat_photo = userss_photo if userss_photo else config.START_IMG_URL
         except AttributeError:
             chat_photo = "assets/nodp.png"
-        await lols.delete()
-        await m.delete()
+
         await message.reply_photo(
             photo=chat_photo,
             caption=_["start_2"].format(message.from_user.mention, app.mention),
@@ -158,6 +108,7 @@ async def start_pm(client, message: Message, _):
                 config.LOGGER_ID,
                 f"{message.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ᴜsᴇʀ ɪᴅ :** {sender_id}\n**ᴜsᴇʀ ɴᴀᴍᴇ:** {sender_name}",
             )
+
 
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
@@ -178,11 +129,7 @@ async def welcome(client, message: Message):
         try:
             language = await get_lang(message.chat.id)
             _ = get_string(language)
-            if await is_banned_user(member.id):
-                try:
-                    await message.chat.ban_member(member.id)
-                except:
-                    pass
+            
             if member.id == app.id:
                 if message.chat.type != ChatType.SUPERGROUP:
                     await message.reply_text(_["start_4"])
