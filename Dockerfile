@@ -4,14 +4,8 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Copy the project definition file first for better layer caching
-# requirements.txt အစား pyproject.toml ကို ကူးထည့်ပါ
-COPY pyproject.toml .
-
-# (Optional) သင့်မှာ setup.py ဒါမှမဟုတ် setup.cfg files တွေ သုံးထားသေးရင် 
-# သူတို့ကိုပါ ဒီနေရာမှာ ကူးထည့်ပေးရပါမယ်။
-# COPY setup.py .
-# COPY setup.cfg .
+# Copy requirements first for better layer caching
+COPY requirements.txt .
 
 # Install system dependencies, Deno, and Python packages in a single layer
 RUN apt-get update -y && apt-get upgrade -y \
@@ -24,10 +18,9 @@ RUN apt-get update -y && apt-get upgrade -y \
     # Install Deno
     && curl -fsSL https://deno.land/install.sh | sh \
     && ln -s /root/.deno/bin/deno /usr/local/bin/deno \
-    # Install Python dependencies
+    # Install Python dependencies from requirements.txt
     && pip3 install -U pip \
-    # requirements.txt အစား "pip3 install ." ကို အသုံးပြုပါ
-    && pip3 install -U . --no-cache-dir \
+    && pip3 install -U -r requirements.txt --no-cache-dir \
     # Clean up apt cache
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
