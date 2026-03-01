@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from random import randint
 from typing import Union
@@ -6,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup
 from pyrogram.enums import ParseMode
 
 import config
-from maythusharmusic import YouTube, app  # Carbon ကို ဒီနေရာမှာ ဖြုတ်လိုက်ပါပြီ
+from maythusharmusic import YouTube, app
 from maythusharmusic.core.call import Hotty
 from maythusharmusic.misc import db
 from maythusharmusic.utils.database import add_active_video_chat, is_active_chat
@@ -152,7 +153,6 @@ async def stream(
         if count == 0:
             return
         else:
-            # Carbon function ဖယ်ရှားပြီး Link ကို Message အနေနဲ့ ပို့မယ့်အပိုင်း
             link = await HottyBin(msg)
             upl = close_markup(_)
             return await app.send_message(
@@ -458,7 +458,7 @@ async def stream(
             button = stream_markup(_, chat_id)
             
             index_text = (
-                f"<emoji id='6131758159473156126'>🎧</emoji> <b>Sᴛʀᴇᴀᴍɪɴɢ sᴛᴀʀᴛᴇᴅ (Index Stream)</b> |\n\n"
+                f"<emoji id='6131758159473156126'>🎧</emoji> <b>Sᴛʀᴇᴀᴍɪɴɢ sᴛᴀʀᴛᴇᴅ (Index Stream)</b>\n\n"
                 f"<emoji id='6300622254778616022'>👤</emoji> <b>Rᴇǫᴜᴇsᴛᴇʀ :</b> {user_name}"
             )
             run = await app.send_photo(
