@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.enums import ParseMode
 
 import config
 from maythusharmusic import YouTube, app
@@ -11,6 +13,18 @@ from maythusharmusic.utils.inline import close_markup, stream_markup
 from maythusharmusic.utils.stream.autoclear import auto_clean
 from maythusharmusic.utils.thumbnails import get_thumb
 from config import BANNED_USERS
+
+
+def get_stream_text(t, d, u):
+    t = str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    u = str(u).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    
+    return (
+        f"<emoji id='6131758159473156126'>🎧</emoji> <b>စတင်ထုတ်လွှင့်နေပြီ </b>\n"
+        f"<emoji id='6300622254778616022'>🎵</emoji> <b>ခေါင်းစဉ် :</b> {t[:27]}\n"
+        f"<emoji id='6300757202651055745'>⏱</emoji> <b>ကြာချိန် :</b> {d} ᴍɪɴᴜᴛᴇs\n"
+        f"<emoji id='6298751564592973547'>👤</emoji> <b>တောင်းဆိုသူ :</b> {u}"
+    )
 
 
 @app.on_message(
@@ -102,6 +116,7 @@ async def skip(cli, message: Message, _, chat_id):
         db[chat_id][0]["seconds"] = check[0]["old_second"]
         db[chat_id][0]["speed_path"] = None
         db[chat_id][0]["speed"] = 1.0
+        
     if "live_" in queued:
         n, link = await YouTube.video(videoid, True)
         if n == 0:
@@ -116,18 +131,17 @@ async def skip(cli, message: Message, _, chat_id):
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
         img = await get_thumb(videoid)
+        
+        # 🟢 get_stream_text အသုံးပြုခြင်း
         run = await message.reply_photo(
             photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
+            caption=get_stream_text(title, check[0]["dur"], user),
             reply_markup=InlineKeyboardMarkup(button),
+            parse_mode=ParseMode.HTML,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
+        
     elif "vid_" in queued:
         mystic = await message.reply_text(_["call_7"], disable_web_page_preview=True)
         try:
@@ -149,32 +163,39 @@ async def skip(cli, message: Message, _, chat_id):
             return await mystic.edit_text(_["call_6"])
         button = stream_markup(_, chat_id)
         img = await get_thumb(videoid)
+        
+        # 🟢 get_stream_text အသုံးပြုခြင်း
         run = await message.reply_photo(
             photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
+            caption=get_stream_text(title, check[0]["dur"], user),
             reply_markup=InlineKeyboardMarkup(button),
+            parse_mode=ParseMode.HTML,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "stream"
         await mystic.delete()
+        
     elif "index_" in queued:
         try:
             await Hotty.skip_stream(chat_id, videoid, video=status)
         except:
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
+        
+        index_text = (
+            f"<emoji id='6131758159473156126'>🎧</emoji> <b>စတင်ထုတ်လွှင့်နေပြီ (Index Stream)</b>\n"
+            f"<emoji id='6131758159473156126'>👤</emoji> <b>တောင်းဆိုသူ :</b> {user}"
+        )
+        
         run = await message.reply_photo(
             photo=config.STREAM_IMG_URL,
-            caption=_["stream_2"].format(user),
+            caption=index_text,
             reply_markup=InlineKeyboardMarkup(button),
+            parse_mode=ParseMode.HTML,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
+        
     else:
         if videoid == "telegram":
             image = None
@@ -189,44 +210,47 @@ async def skip(cli, message: Message, _, chat_id):
             await Hotty.skip_stream(chat_id, queued, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
+            
         if videoid == "telegram":
             button = stream_markup(_, chat_id)
+            
+            # 🟢 get_stream_text အသုံးပြုခြင်း
             run = await message.reply_photo(
                 photo=config.TELEGRAM_AUDIO_URL
                 if str(streamtype) == "audio"
                 else config.TELEGRAM_VIDEO_URL,
-                caption=_["stream_1"].format(
-                    config.SUPPORT_CHAT, title[:23], check[0]["dur"], user
-                ),
+                caption=get_stream_text(title, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
+                parse_mode=ParseMode.HTML,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
+            
         elif videoid == "soundcloud":
             button = stream_markup(_, chat_id)
+            
+            # 🟢 get_stream_text အသုံးပြုခြင်း
             run = await message.reply_photo(
                 photo=config.SOUNCLOUD_IMG_URL
                 if str(streamtype) == "audio"
                 else config.TELEGRAM_VIDEO_URL,
-                caption=_["stream_1"].format(
-                    config.SUPPORT_CHAT, title[:23], check[0]["dur"], user
-                ),
+                caption=get_stream_text(title, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
+                parse_mode=ParseMode.HTML,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
+            
         else:
             button = stream_markup(_, chat_id)
             img = await get_thumb(videoid)
+            
+            # 🟢 get_stream_text အသုံးပြုခြင်း
             run = await message.reply_photo(
                 photo=img,
-                caption=_["stream_1"].format(
-                    f"https://t.me/{app.username}?start=info_{videoid}",
-                    title[:23],
-                    check[0]["dur"],
-                    user,
-                ),
+                caption=get_stream_text(title, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
+                parse_mode=ParseMode.HTML,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
